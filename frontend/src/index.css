@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  --width-card: 580px;
+}
+
+@utility w-card{
+    width: var(--width-card);
+}
+
