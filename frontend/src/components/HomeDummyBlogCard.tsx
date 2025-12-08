@@ -7,7 +7,7 @@ interface BlogCardProps {
   title: string;
   content: string;
   publishDate: string;
-  id: string;
+  id?: string;
 }
 
 export function HomeDummyBlogCard({
@@ -15,7 +15,6 @@ export function HomeDummyBlogCard({
   title,
   content,
   publishDate,
-  id,
 }: BlogCardProps) {
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
