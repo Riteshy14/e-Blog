@@ -2,7 +2,9 @@ import { type SignupInput } from "@riteshy14/medium-common";
 import axios from "axios";
 import { useState, type ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BACKEND_URL } from "../config";
+
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export function Auth({ type }: { type: "signup" | "signin" }) {
   const navigate = useNavigate();

@@ -1,8 +1,9 @@
 import axios from "axios";
-import { BACKEND_URL } from "../config";
 import { useState } from "react";
 
 export function DeleteBlog({ id, authorId }:{id:string ,authorId:string}) {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+  
   const loggedInUser = localStorage.getItem("userId");
   const [loading, setLoading] = useState(false);
 
