@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { DeleteBlog } from "./DeleteBlog";
@@ -8,8 +8,8 @@ interface BlogCardProps {
   title: string;
   content: string;
   publishDate: string;
-  id:string;
-  authorId:string
+  id: string;
+  authorId: string;
 }
 
 export function BlogCard({
@@ -20,23 +20,41 @@ export function BlogCard({
   id,
   authorId
 }: BlogCardProps) {
+
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
-
   const [userLiked, setUserLiked] = useState(false);
   const [userDisliked, setUserDisliked] = useState(false);
 
-  function likebuttn() {
+  // Load from localStorage
+  useEffect(() => {
+    const savedLikes = localStorage.getItem(`likes-${id}`);
+    const savedDislikes = localStorage.getItem(`dislikes-${id}`);
+    const savedUserLiked = localStorage.getItem(`userLiked-${id}`);
+    const savedUserDisliked = localStorage.getItem(`userDisliked-${id}`);
+
+    if (savedLikes) setLikes(Number(savedLikes));
+    if (savedDislikes) setDislikes(Number(savedDislikes));
+    if (savedUserLiked) setUserLiked(savedUserLiked === "true");
+    if (savedUserDisliked) setUserDisliked(savedUserDisliked === "true");
+  }, [id]);
+
+  // Save to localStorage
+  useEffect(() => {
+    localStorage.setItem(`likes-${id}`, likes.toString());
+    localStorage.setItem(`dislikes-${id}`, dislikes.toString());
+    localStorage.setItem(`userLiked-${id}`, userLiked.toString());
+    localStorage.setItem(`userDisliked-${id}`, userDisliked.toString());
+  }, [likes, dislikes, userLiked, userDisliked, id]);
+
+  function likebuttn(e: React.MouseEvent) {
+    e.preventDefault();
     if (userLiked) {
-      // undo like
       setLikes(likes - 1);
       setUserLiked(false);
     } else {
-      // add like
       setLikes(likes + 1);
       setUserLiked(true);
-
-      // remove dislike if active
       if (userDisliked) {
         setDislikes(dislikes - 1);
         setUserDisliked(false);
@@ -44,17 +62,14 @@ export function BlogCard({
     }
   }
 
-  function dislikebuttn() {
+  function dislikebuttn(e: React.MouseEvent) {
+    e.preventDefault();
     if (userDisliked) {
-      // undo dislike
       setDislikes(dislikes - 1);
       setUserDisliked(false);
     } else {
-      // add dislike
       setDislikes(dislikes + 1);
       setUserDisliked(true);
-
-      // remove like if active
       if (userLiked) {
         setLikes(likes - 1);
         setUserLiked(false);
@@ -64,53 +79,56 @@ export function BlogCard({
 
   return (
     <Link to={`/blog/${id}`}>
-    <div className="p-5 shadow-lg w-sm md:w-2xl m-4 shadow-slate-900/30 transition-all duration-300  hover:scale-105 active:scale-95 hover:shadow-slate-500 active:shadow-indigo-500/45  bg-white  rounded-xl cursor-pointer">
-      <div className="flex items-center gap-2 ">
-        <Avatar name={authorname} size={30}/>
-        <p className="text-black text-sm items-center">{authorname}</p>
-        <div className="h-1 w-1 bg-gray-500 rounded-full"></div>
-        <div className="flex">
-        <p className="text-gray-700 text-sm">{publishDate}</p>
-        </div>
-        <div className="flex justify-center items-center pl-12 md:pl-96">
-           <DeleteBlog authorId={authorId} id={id}/>
-        </div>
-      </div>
-      <div className="mt-2">
-        <p className="font-bold">{title}</p>
-        <p className="text-slate-700 pt-1">{content.slice(0, 100) + "..."}</p>
-      </div>
-      <div className="flex mt-4 items-center justify-between">
-        <div className="text-gray-500 text-sm">{`${Math.ceil(content.length / 100)} min read`}</div>
-        <div className="flex gap-4 md:gap-10 text-gray-600 pr-20">
-          <button
-            onClick={likebuttn}
-            className={` ${
-              userLiked === true ? "text-blue-400" : ""
-            } hover:text-blue-600 flex gap-2`}
-          >
-            <FaThumbsUp size={20} /> {likes}
-          </button>
+      <div className="p-5 shadow-lg w-sm md:w-2xl m-4 bg-white rounded-xl cursor-pointer">
 
-          <button
-            onClick={dislikebuttn}
-            className={` ${
-              userDisliked === true ? "text-red-600" : ""
-            } hover:text-red-600 flex gap-2`}
-          >
-            <FaThumbsDown size={20} /> {dislikes}
-          </button>
+        <div className="flex items-center gap-2">
+          <Avatar name={authorname} size={30} />
+          <p className="text-sm">{authorname}</p>
+          <p className="text-sm text-gray-600">{publishDate}</p>
+
+          <div className="flex justify-center items-center ml-auto">
+            <DeleteBlog authorId={authorId} id={id} />
+          </div>
         </div>
+
+        <div className="mt-2">
+          <p className="font-bold">{title}</p>
+          <p className="text-slate-700 pt-1">{content.slice(0, 100)}...</p>
+        </div>
+
+        <div className="flex mt-4 justify-between">
+          <div className="text-sm text-gray-500">{`${Math.ceil(content.length / 100)} min read`}</div>
+
+          <div className="flex gap-6 text-gray-600">
+
+            <button
+              onClick={likebuttn}
+              className={`${userLiked ? "text-blue-500" : ""} flex gap-2`}
+            >
+              <FaThumbsUp size={20} /> {likes}
+            </button>
+
+            <button
+              onClick={dislikebuttn}
+              className={`${userDisliked ? "text-red-500" : ""} flex gap-2`}
+            >
+              <FaThumbsDown size={20} /> {dislikes}
+            </button>
+          </div>
+        </div>
+
       </div>
-    </div>
     </Link>
   );
 }
 
-export function Avatar({name,size=30,height} : { name : string, size?:number, height?:number}) {
+export function Avatar({ name, size }: { name: string; size?: number }) {
   return (
-    <div className={` cursor-pointer bg-blue-500 shadow-sm shadow-gray-500 text-white flex items-center justify-center bg-neutral-tertiary rounded-full`} style={{width:size,height:size}}>
-      <div className={`font-medium flex justify-center items-center `} style={{fontSize:height}}>{name[0]}</div>
+    <div
+      className="bg-blue-500 text-white rounded-full flex items-center justify-center"
+      style={{ width: size, height: size }}
+    >
+      {name[0]}
     </div>
   );
 }
