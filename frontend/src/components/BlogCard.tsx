@@ -122,13 +122,26 @@ export function BlogCard({
   );
 }
 
-export function Avatar({ name, size }: { name: string; size?: number }) {
+export function Avatar({
+  name,
+  size = 30,
+  height
+}: {
+  name: string;
+  size?: number;
+  height?: number;
+}) {
   return (
     <div
-      className="bg-blue-500 text-white rounded-full flex items-center justify-center"
+      className={`cursor-pointer bg-blue-500 shadow-sm shadow-gray-500 text-white flex items-center justify-center rounded-full`}
       style={{ width: size, height: size }}
     >
-      {name[0]}
+      <div
+        className={`font-medium flex justify-center items-center`}
+        style={{ fontSize: height }}
+      >
+        {name[0]}
+      </div>
     </div>
   );
 }
